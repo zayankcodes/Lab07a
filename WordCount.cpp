@@ -125,35 +125,43 @@ std::string WordCount::makeValidWord(std::string word) {
 }
 
 void WordCount::dumpWordsSortedByWord(std::ostream &out) const {
+  std::vector<std::pair<std::string,int> > all;
 
-  std::vector<std::pair<std::string,int>> all;
   all.reserve(getNumUniqueWords());
+  for (size_t i=0;i<CAPACITY;i++) for (std::vector<std::pair<std::string,int> >::const_iterator it=table[i].begin(); it!=table[i].end(); ++it) all.push_back(*it);
 
-  for (size_t i=0;i<CAPACITY;i++) for (const auto& p:table[i]) all.push_back(p);
-  std::sort(all.begin(), all.end(), [](const auto& a, const auto& b){
-    return a.first > b.first;
-  });
-  for (const auto& p: all) out << p.first << "," << p.second << "\n";
+  std::sort(all.begin(), all.end(),
+    [](const std::pair<std::string,int>& a, const std::pair<std::string,int>& b){
+      return a.first > b.first;
+    }
+  );
+
+  for (size_t i=0;i<all.size();++i) out << all[i].first << "," << all[i].second << "\n";
 
 }
+
 
 void WordCount::dumpWordsSortedByOccurence(std::ostream &out) const {
 
-  std::vector<std::pair<std::string,int>> all;
+  std::vector<std::pair<std::string,int> > all;
   all.reserve(getNumUniqueWords());
 
-  for (size_t i=0;i<CAPACITY;i++) for (const auto& p:table[i]) all.push_back(p);
-  std::sort(all.begin(), all.end(), [](const auto& a, const auto& b){
-    if (a.second!=b.second) return a.second<b.second;
-    return a.first<b.first;
-  });
+  for (size_t i=0;i<CAPACITY;i++) for (std::vector<std::pair<std::string,int> >::const_iterator it=table[i].begin(); it!=table[i].end(); ++it) all.push_back(*it);
 
-  for (const auto& p: all) out << p.first << "," << p.second << "\n";
+  std::sort(all.begin(), all.end(),
+    [](const std::pair<std::string,int>& a, const std::pair<std::string,int>& b){
+      if (a.second != b.second) return a.second < b.second;
+      return a.first < b.first;
+    }
+  );
+
+  for (size_t i=0;i<all.size();++i) out << all[i].first << "," << all[i].second << "\n";
 }
+
 
 void WordCount::addAllWords(std::string text) {
   std::istringstream iss(text);
   std::string token;
   while (iss >> token) incrWordCount(token);
-  
+
 }
